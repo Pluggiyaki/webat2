@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Оформление заказа</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0 0;
+            display: flex;
+            gap: 15px;
+        }
+
+        nav ul li {
+            display: inline;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin-top: 10px;
+        }
+
+        form input {
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        form button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Оформление заказа</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="catalog.html">Каталог</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div id="orderDetails">
+        <p>Загрузка данных автомобиля...</p>
+    </div>
+    <form id="orderForm">
+        <h2>Введите данные</h2>
+        <label for="name">Имя:</label>
+        <input type="text" id="name" required>
+
+        <label for="phone">Телефон:</label>
+        <input type="tel" id="phone" required>
+
+        <button type="submit">Оформить заказ</button>
+    </form>
+</main>
+
+<script>
+    // Проверка авторизации при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+        if (!isLoginPage && !isLoggedIn) {
+        window.location.href = 'login.html';
+        }
+    });
+    // Получение данных автомобиля из URL
+    const params = new URLSearchParams(window.location.search);
+    const brand = params.get('brand');
+    const model = params.get('model');
+    const price = params.get('price');
+
+    const orderDetails = document.getElementById('orderDetails');
+    if (brand && model && price) {
+        orderDetails.innerHTML = `
+            <h2>Вы выбрали: ${brand} ${model}</h2>
+            <p>Цена: ${parseInt(price).toLocaleString()} руб.</p>
+        `;
+    } else {
+        orderDetails.innerHTML = '<p>Ошибка: данные автомобиля не получены.</p>';
+        document.getElementById('orderForm').style.display = 'none';
+    }
+
+    // Сохранение и восстановление имени и телефона
+    const nameInput = document.getElementById('name');
+    const phoneInput = document.getElementById('phone');
+
+    nameInput.value = localStorage.getItem('checkout_name') || '';
+    phoneInput.value = localStorage.getItem('checkout_phone') || '';
+
+    nameInput.addEventListener('input', e => {
+        localStorage.setItem('checkout_name', e.target.value);
+    });
+
+    phoneInput.addEventListener('input', e => {
+        localStorage.setItem('checkout_phone', e.target.value);
+    });
+
+    // Обработка отправки формы
+    document.getElementById('orderForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        alert('Заказ оформлен! Мы скоро с вами свяжемся.');
+        localStorage.removeItem('checkout_name');
+        localStorage.removeItem('checkout_phone');
+        window.location.href = 'index.html';
+    });
+</script>
+</body>
+</html>

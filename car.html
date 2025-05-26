@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация об автомобиле</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Детальная информация</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="catalog.html">Каталог</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <div id="carDetails"></div>
+</main>
+
+<script>
+    // Проверка авторизации при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+        if (!isLoginPage && !isLoggedIn) {
+        window.location.href = 'login.html';
+        }
+    });
+    
+    const cars = [
+        { brand: 'LADA', model: 'Vesta', price: 900000, img: 'image/Vesta.jpg' },
+        { brand: 'Audi', model: 'A6', price: 5200000, img: 'image/A6.jpg' },
+        { brand: 'BMW', model: 'X5', price: 6000000, img: 'image/X5.jpg' },
+        { brand: 'LADA', model: 'Granta', price: 700000, img: 'image/Granta.jpg' },
+    ];
+
+    function getModelFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('model');
+    }
+
+    function displayCarDetails() {
+        const modelParam = getModelFromURL();
+        if (!modelParam) {
+            document.getElementById('carDetails').innerHTML = '<p>Автомобиль не найден.</p>';
+            return;
+        }
+
+        const car = cars.find(c => c.model.toLowerCase() === modelParam.toLowerCase());
+        if (!car) {
+            document.getElementById('carDetails').innerHTML = '<p>Автомобиль не найден.</p>';
+            return;
+        }
+
+        document.getElementById('carDetails').innerHTML = `
+            <h2>${car.brand} ${car.model}</h2>
+            <img src="${car.img}" alt="${car.brand} ${car.model}" width="400">
+            <p>Цена: ${car.price.toLocaleString()} руб.</p>
+            <p>Описание: Отличный автомобиль для любых дорог!</p>
+            <button id="buyBtn">Купить</button>
+        `;
+
+        document.getElementById('buyBtn').addEventListener('click', function () {
+            const url = `checkout.html?brand=${encodeURIComponent(car.brand)}&model=${encodeURIComponent(car.model)}&price=${car.price}`;
+            window.location.href = url;
+        });
+    }
+
+    window.onload = displayCarDetails;
+</script>
+</body>
+</html>

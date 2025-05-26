@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Каталог автомобилей</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<header>
+			<h1>Каталог автомобилей</h1>
+			<nav>
+				<ul>
+					<li><a href="index.html">Главная</a></li>
+					<li><a href="catalog.html">Каталог</a></li>
+				</ul>
+			</nav>
+		</header>
+
+		<main>
+			<h2>Найти автомобиль:</h2>
+			<input
+				type="text"
+				id="searchInput"
+				placeholder="Введите марку или модель"
+			/>
+			<input type="number" id="minPrice" placeholder="Мин. цена" />
+			<input type="number" id="maxPrice" placeholder="Макс. цена" />
+			<button onclick="applyFilter()">Фильтровать</button>
+			<button onclick="clearFilters()" class="secondary-btn">
+				Сбросить фильтры
+			</button>
+			<div id="carList"></div>
+		</main>
+
+		<button id="clearCookiesButton" onclick="clearAllData()">
+			Очистить cookie
+		</button>
+
+		<script>
+			// Проверка авторизации при загрузке страницы
+		document.addEventListener('DOMContentLoaded', function() {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    	if (!isLoginPage && !isLoggedIn) {
+        window.location.href = 'login.html';
+    	}
+	});
+			const cars = [
+				{
+					brand: 'LADA',
+					model: 'Vesta',
+					price: 900000,
+					img: 'image/Vesta.jpg',
+					description: 'Комфортный седан для города и трассы',
+				},
+				{
+					brand: 'Audi',
+					model: 'A6',
+					price: 5200000,
+					img: 'image/A6.jpg',
+					description: 'Премиальный бизнес-седан с передовыми технологиями',
+				},
+				{
+					brand: 'BMW',
+					model: 'X5',
+					price: 6000000,
+					img: 'image/X5.jpg',
+					description: 'Мощный и стильный внедорожник премиум-класса',
+				},
+				{
+					brand: 'LADA',
+					model: 'Granta',
+					price: 700000,
+					img: 'image/Granta.jpg',
+					description: 'Доступный и надежный городской автомобиль',
+				},
+			]
+
+			// Инициализация при загрузке
+			document.addEventListener('DOMContentLoaded', function () {
+				restoreFilter()
+				displayCars(cars) // Показываем все машины по умолчанию
+			})
+
+			function displayCars(list) {
+				const container = document.getElementById('carList')
+				container.innerHTML = ''
+
+				if (list.length === 0) {
+					container.innerHTML =
+						'<p class="no-results">Ничего не найдено. Попробуйте изменить параметры поиска.</p>'
+					return
+				}
+
+				list.forEach(car => {
+					const carDiv = document.createElement('div')
+					carDiv.className = 'car'
+					carDiv.innerHTML = `
+      <a href="car.html?brand=${encodeURIComponent(
+				car.brand.toLowerCase()
+			)}&model=${encodeURIComponent(car.model.toLowerCase())}">
+        <img src="${car.img}" alt="${car.brand} ${car.model}" width="250">
+        <div class="car-info">
+          <h3>${car.brand} ${car.model}</h3>
+          <p>Цена: ${car.price.toLocaleString()} руб.</p>
+          <p class="car-description">${car.description}</p>
+        </div>
+      </a>
+      <button onclick="buyCar('${car.brand}', '${car.model}', ${
+						car.price
+					}, event)">Купить</button>
+    `
+					container.appendChild(carDiv)
+				})
+			}
+
+			function applyFilter() {
+				const query = document.getElementById('searchInput').value.toLowerCase()
+				const min = parseInt(document.getElementById('minPrice').value) || 0
+				const max =
+					parseInt(document.getElementById('maxPrice').value) || Infinity
+
+				// Сохраняем состояние фильтров
+				localStorage.setItem('filter_search', query)
+				localStorage.setItem(
+					'filter_min',
+					document.getElementById('minPrice').value
+				)
+				localStorage.setItem(
+					'filter_max',
+					document.getElementById('maxPrice').value
+				)
+
+				const filtered = cars.filter(car => {
+					const matchText =
+						car.brand.toLowerCase().includes(query) ||
+						car.model.toLowerCase().includes(query) ||
+						car.description.toLowerCase().includes(query)
+					const matchPrice = car.price >= min && car.price <= max
+					return matchText && matchPrice
+				})
+
+				displayCars(filtered)
+			}
+
+			function restoreFilter() {
+				const query = localStorage.getItem('filter_search') || ''
+				const min = localStorage.getItem('filter_min') || ''
+				const max = localStorage.getItem('filter_max') || ''
+
+				document.getElementById('searchInput').value = query
+				document.getElementById('minPrice').value = min
+				document.getElementById('maxPrice').value = max
+
+				// Применяем фильтр только если есть сохраненные значения
+				if (query || min || max) {
+					applyFilter()
+				}
+			}
+
+			function clearFilters() {
+				document.getElementById('searchInput').value = ''
+				document.getElementById('minPrice').value = ''
+				document.getElementById('maxPrice').value = ''
+
+				// Удаляем сохраненные фильтры
+				localStorage.removeItem('filter_search')
+				localStorage.removeItem('filter_min')
+				localStorage.removeItem('filter_max')
+
+				displayCars(cars) // Показываем все машины
+			}
+
+			function buyCar(brand, model, price, event) {
+				event.preventDefault() // Предотвращаем переход по ссылке
+				const url = `checkout.html?brand=${encodeURIComponent(
+					brand
+				)}&model=${encodeURIComponent(model)}&price=${price}`
+				window.location.href = url
+			}
+
+			function clearAllData() {
+				// Очищаем все сохраненные данные
+				localStorage.clear()
+
+				// Сбрасываем фильтры на странице
+				clearFilters()
+
+				// Показываем уведомление
+				alert(
+					'Все данные (фильтры, формы) были сброшены. Страница будет перезагружена.'
+				)
+
+				// Перезагружаем страницу
+				window.location.reload()
+			}
+		</script>
+	</body>
+</html>

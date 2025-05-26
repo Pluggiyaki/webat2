@@ -1,0 +1,114 @@
+<!-- about.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Российский автомобильный маркетплейс</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Российский автомобильный маркетплейс</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html" class="test">Главная</a></li>
+                <li><a href="catalog.html">Каталог</a></li>
+                <li><a href="#about">Об авторе</a></li>
+                <li><a href="#aboutProgram">О программе</a></li>
+                
+            </ul>
+        </nav>
+        <div id="authInfo" style="margin-top: 10px;">
+            <span id="usernameDisplay"></span>
+            <button id="authButton" style="margin-left: 10px;"></button>
+        </div>
+    </header>
+    <main>
+
+
+        <h2 id="about">Об авторе</h2>
+        <img src="image/photo.jpg" alt="Фото автора" width="500px"> 
+        <p>Имя: Сергей Джаваскриптович Лагов.</p>
+        <p>Краткая биография: Родился в деревне Псевдополе, где с детства увлекался сложением нулей и единиц.
+            В университете защитил диплом на тему «Оптимизация неработающего кода: искусство комментирования».
+            После этого устроился в IT-компанию, где за два дня работы обнаружил в проекте столько багов, что его отправили в отпуск за счёт фирмы.
+            Главное кредо Багдата: «Если код работает — не трогай. Если не работает — скажи, что это фича».
+            Он создал свой уникальный стиль программирования, который сам называет "Try-Catch-Ignore".</p>
+        <br>
+        <h2 id="aboutProgram">О программе</h2>
+        <p>Автомобильный маркетплейс — это удобная онлайн-платформа для покупки и продажи автомобилей. Здесь вы найдете широкий выбор новых и подержанных машин от частных продавцов и автосалонов.
+        Мы предлагаем простую навигацию, удобные фильтры поиска и подробные описания каждого автомобиля. Наш сервис помогает сэкономить время, найти лучшие предложения и сделать уверенную покупку.
+        Независимо от того, ищете ли вы семейный седан или мощный внедорожник, у нас есть всё для вашего идеального выбора.</p>
+
+
+    </main>
+    <footer>
+        <p>Связаться: <a href="mailto:author@example.com">author@gmail.com</a></p>
+        <p>Социальные сети: <a href="https://vk.com/id427927823">VK</a> | <a href="#">Instagram</a></p>
+    </footer>
+    <button id="clearCookiesButton" onclick="clearCookies()">Очистить cookie</button>
+    <script>
+        // Проверка авторизации при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+    const isLoginPage = window.location.pathname.includes('login.html');
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+        if (!isLoginPage && !isLoggedIn) {
+        window.location.href = 'login.html';
+        }
+    });
+        function clearCookies() {
+            deleteCookie('cookiesAccepted');
+            deleteCookie('searchQuery');
+            deleteCookie('minPrice');
+            deleteCookie('maxPrice');
+            alert('Куки очищены!');
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+        }
+    </script>
+    <script>
+        // Проверяем статус авторизации
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const username = localStorage.getItem('username');
+            const authButton = document.getElementById('authButton');
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            
+            if (isLoggedIn && username) {
+                usernameDisplay.textContent = `Вы вошли как: ${username}`;
+                authButton.textContent = 'Выйти';
+                authButton.onclick = logout;
+            } else {
+                usernameDisplay.textContent = '';
+                authButton.textContent = 'Войти';
+                authButton.onclick = function() { window.location.href = 'login.html'; };
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            checkAuth(); // Обновляем отображение
+        }
+        
+        // Проверяем авторизацию при загрузке страницы
+        document.addEventListener('DOMContentLoaded', checkAuth);
+        
+        // Модифицируем функцию очистки куки, чтобы она также разлогинивала
+        function clearCookies() {
+            deleteCookie('cookiesAccepted');
+            deleteCookie('searchQuery');
+            deleteCookie('minPrice');
+            deleteCookie('maxPrice');
+            logout(); // Добавляем выход из системы
+            alert('Куки очищены и выполнен выход из системы!');
+        }
+    </script>
+
+    
+</body>
+</html>
